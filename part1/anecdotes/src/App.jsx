@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useState } from 'react'
 
 const App = () => {
@@ -13,8 +14,52 @@ const App = () => {
   ]
 
   const [selected, setSelected] = useState(0)
+  const voteArray = Array(anecdotes.length).fill(0)
+  const [vote, setVote] = useState(voteArray)
 
-  return <div>{anecdotes[selected]}</div>
+  const handleClick = () => {
+    const getRandomAnecdote = () => {
+      return Math.floor(Math.random() * anecdotes.length)
+    }
+    setSelected(getRandomAnecdote())
+  }
+
+  const handleVote = () => {
+    const newVotes = [...vote]
+    newVotes[selected]++
+    setVote([...newVotes])
+  }
+  console.log(vote)
+
+  return (
+    <>
+      <h1>Anecdote of the day</h1>
+      <div>{anecdotes[selected]}</div>
+      <Button text="vote" handleClick={handleVote} />
+      <Button text="next anecdote" handleClick={handleClick} />
+      <DisplayVote vote={vote} selected={selected} />
+      <DisplayMostVoted anecdotes={anecdotes} vote={vote} />
+    </>
+  )
 }
 
+const Button = (props) => {
+  return <button onClick={props.handleClick}>{props.text}</button>
+}
+
+const DisplayVote = (props) => {
+  return <p>has {props.vote[props.selected]} vote/s</p>
+}
+
+const DisplayMostVoted = (props) => {
+  const maxVotesIndex = props.vote.indexOf(Math.max(...props.vote))
+  const mostVoted = props.anecdotes[maxVotesIndex]
+  return (
+    <>
+      <h1>Anecdote with most votes</h1>
+      <p>{mostVoted}</p>
+      <p>has {props.vote[maxVotesIndex]} votes</p>
+    </>
+  )
+}
 export default App
