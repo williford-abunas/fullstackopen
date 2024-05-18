@@ -57,9 +57,7 @@ const App = () => {
       />
       <h2>Numbers</h2>
       {filteredPersons.map((person) => (
-        <>
-          <Persons person={person} key={person.id} />
-        </>
+        <Persons person={person} key={person.id} />
       ))}
     </div>
   )
