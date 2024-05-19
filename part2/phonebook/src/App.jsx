@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
-
+import phonebookApi from './apiClient/api'
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -11,25 +10,59 @@ const App = () => {
   const [filter, setFilter] = useState('')
 
   useEffect(() => {
-    axios
-    .get("http://localhost:3001/persons")
-    .then(response => setPersons(response.data))
+    const fetchPersons = async () => {
+      try {
+        const response = await phonebookApi.getAllUsers()
+        setPersons(response)
+      } catch (error) {
+        console.error('Error fetching persons:', error)
+      }
+    }
+    fetchPersons()
   }, [])
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
 
     // Check if name exists do not add : if exists then add
     for (const person of persons) {
       if (newPerson.name === person.name) {
-        alert(`${newPerson} is already added!`)
-        setNewPerson({ name: '', number: '' })
-        return
+        const confirmUpdate = window.confirm(
+          `${newPerson.name} is already added to phonebook, replace old number with the new one?`
+        )
+
+        if (confirmUpdate) {
+          try {
+            const updatedUser = await phonebookApi.updateUser(
+              person.id,
+              newPerson
+            )
+            setPersons(
+              persons.map((p) =>
+                p.id === person.id ? { ...updatedUser, id: person.id } : p
+              )
+            )
+            setNewPerson({ name: '', number: '' })
+            return
+          } catch (error) {
+            console.error('Error updating user:', error)
+          }
+        } else {
+          setNewPerson({ name: '', number: '' })
+          return
+        }
       }
     }
 
-    setPersons([...persons, { ...newPerson, id: persons.length + 1 }])
-    setNewPerson({ name: '', number: '' })
+    try {
+      const createdUser = await phonebookApi.createUser(newPerson)
+      if (createdUser) {
+        setPersons([...persons, createdUser])
+        setNewPerson({ name: '', number: '' })
+      }
+    } catch (error) {
+      console.error('Error creating user:', error)
+    }
   }
 
   const handleChange = (e) => {
@@ -44,8 +77,19 @@ const App = () => {
     setFilter(e.target.value)
   }
 
-  const filteredPersons = persons.filter((person) =>
-    person.name.toLowerCase().includes(filter.toLowerCase())
+  const handleDelete = async (id) => {
+    if (window.confirm('Delete User?')) {
+      try {
+        await phonebookApi.deleteUser(id)
+        setPersons(persons.filter((person) => person.id !== id))
+      } catch (error) {
+        console.error('Error deleting user:', error)
+      }
+    }
+  }
+
+  const filteredPersons = persons?.filter((person) =>
+    person.name?.toLowerCase().includes(filter.toLowerCase())
   )
 
   return (
@@ -60,7 +104,7 @@ const App = () => {
       />
       <h2>Numbers</h2>
       {filteredPersons.map((person) => (
-        <Persons person={person} key={person.id} />
+        <Persons person={person} key={person.id} handleDelete={handleDelete} />
       ))}
     </div>
   )
