@@ -1,16 +1,18 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import Country from './components/Country'
 import CountryList from './components/CountryList'
+import api from './apiClient'
 
 function App() {
   const [filter, setFilter] = useState('')
   const [countries, setCountries] = useState(null)
 
   useEffect(() => {
-    axios
-      .get('https://studies.cs.helsinki.fi/restcountries/api/all')
-      .then((response) => setCountries(response.data))
+    const fetchCountries = async () => {
+      const countries = await api.getCountries()
+      setCountries(countries)
+    }
+    fetchCountries()
   }, [])
 
   if (!countries) {
