@@ -1,11 +1,27 @@
 import express from 'express'
 import data from './data.js'
+import morgan from 'morgan'
 
 const app = express()
 const PORT = 3001
 
+const requestLogger = (req, res, next) => {
+  console.log('Method:', req.method)
+  console.log('Path:  ', req.path)
+  console.log('Body:  ', req.body)
+  console.log('---')
+  next()
+}
+
+// MOrGAN CONFIG
+morgan.token('body', (req, res) => JSON.stringify(req.body))
+
 // MIDDLE WARE
 app.use(express.json())
+app.use(requestLogger)
+app.use(
+  morgan(':method :url :status :res[content-length] - :response-time ms :body')
+)
 
 // ROUTES
 app.get('/', (req, res) => {
@@ -59,6 +75,12 @@ app.post('/api/persons', (req, res) => {
     .status(201)
     .json(`new person: ${newPerson.name} number ${newPerson.number} is created`)
 })
+
+const unknownEndpoint = (req, res) => {
+  res.status(404).send({ error: 'Unknown endpoint' })
+}
+
+app.use(unknownEndpoint)
 
 // SERVER
 app.listen(PORT, () => {
