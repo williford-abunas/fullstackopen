@@ -53,8 +53,25 @@ personsRouter.post('/persons', (req, res) => {
     name: body.name,
     number: body.number,
   }
-  personsData.push(newPerson)
+  personsData.concat(newPerson)
   res
     .status(201)
-    .json(`new person: ${newPerson.name} number ${newPerson.number} is created`)
+    .json(newPerson)
+})
+
+// UPDATE existing person
+personsRouter.put('/persons/:id', (req, res) => {
+  const id = Number(req.params.id)
+  const body = req.body
+
+  const personIndex = personsData.findIndex((person) => person.id === id)
+
+  if (personIndex === -1) {
+    return res.status(404).json({error: 'person not found'})
+  }
+
+  const updatedPerson = { ...personsData[personIndex], ...body, id}
+  personsData[personIndex] = updatedPerson
+
+  res.json(updatedPerson)
 })
