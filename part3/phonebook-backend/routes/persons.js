@@ -63,10 +63,10 @@ personsRouter.post('/persons', async (req, res) => {
 
   try {
     const savedPerson = await person.save()
-    response.status(201).json(savedPerson)
+    res.status(201).json(savedPerson)
   } catch (error) {
     console.error(error)
-    response.status(500).json({ error: 'Internal server error' })
+    res.status(500).json({ error: 'Internal server error' })
   }
 })
 
