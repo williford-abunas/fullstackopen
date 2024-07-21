@@ -79,7 +79,7 @@ personsRouter.put('/persons/:id', async (req, res, next) => {
     const updatedPerson = await Person.findByIdAndUpdate(
       req.params.id,
       req.body,
-      { new: true }
+      { new: true, runValidators: true, context: 'query' }
     )
 
     if (!updatedPerson) {

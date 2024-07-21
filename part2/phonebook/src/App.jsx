@@ -3,7 +3,7 @@ import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
 import Notification from './components/Notification'
-import phonebookApi from './apiClient/api'
+import phonebookApi from './services/persons'
 import timeOut from './helper'
 
 const App = () => {
@@ -72,7 +72,7 @@ const App = () => {
       timeOut(setMessage)
     } catch (error) {
       console.error('Error creating user:', error)
-      setMessage(error.message)
+      setMessage("Person validation failed:", error.message)
       setError(true)
       timeOut(setMessage)
     }
