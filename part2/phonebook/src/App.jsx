@@ -53,9 +53,7 @@ const App = () => {
           timeOut(setMessage)
         } catch (error) {
           console.error('Error updating user:', error)
-          setMessage(
-            `Information of ${newPerson.name} has already been removed from the server`
-          )
+          setMessage(`Person validation failed: ${error.message}`)
           setError(true)
           timeOut(setMessage)
         }
@@ -72,7 +70,8 @@ const App = () => {
       timeOut(setMessage)
     } catch (error) {
       console.error('Error creating user:', error)
-      setMessage("Person validation failed:", error.message)
+      setMessage(`Person validation failed: ${error.message}`)
+
       setError(true)
       timeOut(setMessage)
     }
