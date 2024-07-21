@@ -49,6 +49,7 @@ const App = () => {
             persons.map((p) => (p.id === existingPerson.id ? updatedUser : p))
           )
           setNewPerson({ name: '', number: '' })
+          setError(false)
           setMessage(`Updated ${updatedUser.name} with ${updatedUser.number}`)
           timeOut(setMessage)
         } catch (error) {
@@ -66,6 +67,7 @@ const App = () => {
       const createdUser = await phonebookApi.createUser(newPerson)
       setPersons([...persons, createdUser])
       setNewPerson({ name: '', number: '' })
+      setError(false)
       setMessage(`Successfully added ${createdUser.name}`)
       timeOut(setMessage)
     } catch (error) {
@@ -94,10 +96,12 @@ const App = () => {
       try {
         await phonebookApi.deleteUser(id)
         setPersons(persons.filter((person) => person.id !== id))
+        setError(false)
         setMessage(`Successfully deleted user ${id}`)
         timeOut(setMessage)
       } catch (error) {
         console.error('Error deleting user:', error)
+        setError(true)
         setMessage(error.message)
         timeOut(setMessage)
       }
