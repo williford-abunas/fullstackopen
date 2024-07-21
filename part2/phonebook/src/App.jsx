@@ -32,8 +32,7 @@ const App = () => {
     const existingPerson = persons.find(
       (person) => person.name === newPerson.name
     )
-    console.log(existingPerson)
-    console.log(newPerson)
+
     if (existingPerson) {
       const confirmUpdate = window.confirm(
         `${newPerson.name} is already added to phonebook, replace old number with the new one?`
@@ -73,7 +72,7 @@ const App = () => {
       timeOut(setMessage)
     } catch (error) {
       console.error('Error creating user:', error)
-      setMessage(`Error adding ${newPerson.name}`)
+      setMessage(error.message)
       setError(true)
       timeOut(setMessage)
     }
@@ -100,6 +99,8 @@ const App = () => {
         timeOut(setMessage)
       } catch (error) {
         console.error('Error deleting user:', error)
+        setMessage(error.message)
+        timeOut(setMessage)
       }
     }
   }
