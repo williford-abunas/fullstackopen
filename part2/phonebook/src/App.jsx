@@ -10,8 +10,7 @@ const App = () => {
   const [persons, setPersons] = useState([])
   const [newPerson, setNewPerson] = useState({ name: '', number: '' })
   const [filter, setFilter] = useState('')
-  const [message, setMessage] = useState(null)
-  const [error, setError] = useState(false)
+  const [message, setMessage] = useState({})
 
   useEffect(() => {
     const fetchPersons = async () => {
@@ -19,6 +18,11 @@ const App = () => {
         const response = await phonebookApi.getAllUsers()
         setPersons(response)
       } catch (error) {
+        setMessage({
+          type: 'error',
+          text: error.message,
+        })
+        timeOut(setMessage)
         console.error('Error fetching persons:', error)
       }
     }
@@ -49,13 +53,17 @@ const App = () => {
             persons.map((p) => (p.id === existingPerson.id ? updatedUser : p))
           )
           setNewPerson({ name: '', number: '' })
-          setError(false)
-          setMessage(`Updated ${updatedUser.name} with ${updatedUser.number}`)
+          setMessage({
+            type: 'success',
+            text: `Updated ${updatedUser.name} with ${updatedUser.number}`,
+          })
           timeOut(setMessage)
         } catch (error) {
           console.error('Error updating user:', error)
-          setMessage(`Person validation failed: ${error.message}`)
-          setError(true)
+          setMessage({
+            type: 'error',
+            text: `Person validation failed: ${error.message}`,
+          })
           timeOut(setMessage)
         }
       }
@@ -67,14 +75,18 @@ const App = () => {
       const createdUser = await phonebookApi.createUser(newPerson)
       setPersons([...persons, createdUser])
       setNewPerson({ name: '', number: '' })
-      setError(false)
-      setMessage(`Successfully added ${createdUser.name}`)
+      setMessage({
+        type: 'success',
+        text: `Successfully added ${createdUser.name}`,
+      })
       timeOut(setMessage)
     } catch (error) {
       console.error('Error creating user:', error)
-      setMessage(`Person validation failed: ${error.message}`)
+      setMessage({
+        type: 'error',
+        text: `Person validation failed: ${error.message}`,
+      })
 
-      setError(true)
       timeOut(setMessage)
     }
   }
@@ -96,13 +108,11 @@ const App = () => {
       try {
         await phonebookApi.deleteUser(id)
         setPersons(persons.filter((person) => person.id !== id))
-        setError(false)
-        setMessage(`Successfully deleted user ${id}`)
+        setMessage({ type: 'success', text: `Successfully deleted user ${id}` })
         timeOut(setMessage)
       } catch (error) {
         console.error('Error deleting user:', error)
-        setError(true)
-        setMessage(error.message)
+        setMessage({ type: 'error', text: `${error.message}` })
         timeOut(setMessage)
       }
     }
@@ -115,7 +125,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={message} error={error} />
+      <Notification message={message} />
       <Filter handleSearch={handleSearch} filter={filter} />
       <h2>Add new entry</h2>
       <PersonForm
