@@ -7,7 +7,7 @@ const app = express()
 const PORT = process.env.PORT || 3001
 
 // MOrGAN CONFIG
-morgan.token('body', (req, res) => JSON.stringify(req.body))
+morgan.token('body', (req) => JSON.stringify(req.body))
 
 // MIDDLE WARE
 app.use(express.static('dist'))
